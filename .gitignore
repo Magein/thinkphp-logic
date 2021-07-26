@@ -1,4 +1,4 @@
 .idea
 .git
-.composer.lock
-/vender/*
+composer.lock
+/vendor/*
