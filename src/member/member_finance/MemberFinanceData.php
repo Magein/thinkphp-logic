@@ -3,7 +3,7 @@
 
 namespace magein\thinkphp_logic\member\member_finance;
 
-use magein\thinkphp_logic\member;
+use app\components\member\Member;
 use magein\tools\common\Variable;
 
 class MemberFinanceData

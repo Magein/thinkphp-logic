@@ -2,7 +2,7 @@
 
 namespace magein\thinkphp_logic\member\member_finance;
 
-use magein\thinkphp_logic\member;
+use app\components\member\Member;
 use magein\thinkphp_extra\MsgContainer;
 use think\db\exception\DbException;
 use magein\thinkphp_extra\traits\Instance;
