@@ -54,6 +54,24 @@ class Member extends Logic
         'create_time',
     ];
 
+    /**
+     * @param $id
+     * @return array|false|\think\Model|null
+     */
+    public function getById($id)
+    {
+        if (empty($id)) {
+            return false;
+        }
+
+        try {
+            $record = $this->model()->where(['id' => $id])->find();
+        } catch (DbException $exception) {
+            $record = null;
+        }
+
+        return $record;
+    }
 
     /**
      * @param $username
