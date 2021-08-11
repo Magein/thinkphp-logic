@@ -2,12 +2,14 @@
 
 namespace magein\thinkphp_logic\member\member_finance;
 
-use app\components\member\Member;
 use magein\thinkphp_extra\MsgContainer;
+use magein\thinkphp_extra\Overt;
+use magein\thinkphp_logic\member\Member;
 use think\db\exception\DbException;
 use magein\thinkphp_extra\traits\Instance;
 use magein\thinkphp_extra\Logic;
 use think\facade\Db;
+use think\Model;
 
 class MemberFinance extends Logic
 {
@@ -122,7 +124,7 @@ class MemberFinance extends Logic
     }
 
     /**
-     * @param \app\components\member\member_finance\MemberFinanceData $financeData
+     * @param MemberFinanceData $financeData
      * @return bool|int
      */
     public function setBalance(MemberFinanceData $financeData)
@@ -192,7 +194,7 @@ class MemberFinance extends Logic
 
     /**
      * 设置用户余额增加
-     * @param \app\components\member\member_finance\MemberFinanceData $financeData
+     * @param MemberFinanceData $financeData
      * @return bool
      */
     public function setBalanceIncrease(MemberFinanceData $financeData)
@@ -203,7 +205,7 @@ class MemberFinance extends Logic
 
     /**
      * 设置用户余额减少
-     * @param \app\components\member\member_finance\MemberFinanceData $financeData
+     * @param MemberFinanceData $financeData
      * @return bool
      */
     public function setBalanceDecrease(MemberFinanceData $financeData)
@@ -230,6 +232,26 @@ class MemberFinance extends Logic
         }
 
         return $records;
+    }
+
+    /**
+     * @param $member_id
+     * @param int $page_size
+     * @return array|false
+     */
+    public function getListByMemberId($member_id, $page_size = 20)
+    {
+        if (empty($member_id)) {
+            return false;
+        }
+        try {
+            $model = $this->model();
+            $records = $model->order('id', 'desc')->where('member_id', $member_id)->paginate($page_size);
+        } catch (DbException $exception) {
+            $records = null;
+        }
+
+        return Overt::paginate($records, $page_size);
     }
 
 }
