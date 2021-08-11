@@ -27,8 +27,8 @@ use magein\thinkphp_extra\Model;
  */
 class MemberModel extends Model
 {
-    protected $table = 'member';        
-        
+    protected $table = 'member';
+
     protected $schema = [
         'id' => 'integer',
         'username' => 'string',
@@ -48,15 +48,31 @@ class MemberModel extends Model
         'update_time' => 'integer',
         'delete_time' => 'integer',
     ];
-    
-    
+
+
     /**
      * @param $value
      * @param $data
      * @return array|string
-     */                
+     */
     protected function getSexTextAttr($value, $data)
     {
         return Member::instance()->transSex($data['sex'] ?? '');
+    }
+
+    /**
+     * 设置性别
+     * @param $value
+     * @return int
+     */
+    protected function setSexAttr($value)
+    {
+        $value = intval($value);
+
+        if ($value < 0 || $value > 2) {
+            $value = 0;
+        }
+
+        return $value;
     }
 }    

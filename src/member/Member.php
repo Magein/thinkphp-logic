@@ -56,9 +56,10 @@ class Member extends Logic
 
     /**
      * @param $id
+     * @param bool $private 隐私保护
      * @return array|false|\think\Model|null
      */
-    public function getById($id)
+    public function getById($id, $private = true)
     {
         if (empty($id)) {
             return false;
@@ -68,6 +69,10 @@ class Member extends Logic
             $record = $this->model()->where(['id' => $id])->find();
         } catch (DbException $exception) {
             $record = null;
+        }
+
+        if ($private) {
+            unset($record['password'], $record['username']);
         }
 
         return $record;
