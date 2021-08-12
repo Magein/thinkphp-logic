@@ -2,8 +2,14 @@
 
 namespace magein\thinkphp_logic\system\system_user;
 
+use app\common\login\AdminLogin;
+use magein\thinkphp_extra\ApiReturn;
 use magein\thinkphp_extra\MsgContainer;
+use magein\thinkphp_logic\system\system_auth\SystemAuth;
+use magein\thinkphp_logic\system\system_user_config\SystemUserConfig;
+use magein\thinkphp_logic\system\system_user_login_log\SystemUserLoginLog;
 use magein\tools\common\RegVerify;
+use magein\tools\security\JsonToken;
 use think\db\exception\DbException;
 use magein\thinkphp_extra\traits\Instance;
 use magein\thinkphp_extra\Logic;
@@ -61,6 +67,52 @@ class SystemUser extends Logic
         'status',
         'create_time',
     ];
+
+    public function login()
+    {
+        $username = request()->post('username');
+        $password = request()->post('password');
+
+        $phone = request()->post('phone');
+        $code = request()->post('code');
+
+        $record = [];
+        if ($username && $password) {
+            $record = SystemUser::instance()->getByUsername($username);
+        } elseif ($phone) {
+            $record = SystemUser::instance()->getByPhone($phone);
+        }
+
+        if (empty($record)) {
+            return ApiReturn::error('账号不存在');
+        }
+
+        if (false === password($password, $record->password)) {
+            return ApiReturn::error('账号密码错误');
+        }
+
+        if ($record['status'] == SystemUser::STATUS_FORBID) {
+            return ApiReturn::error('账号已被限制登录');
+        }
+
+        AdminLogin::setUserInfo($record, $record['id']);
+        SystemUserLoginLog::instance()->create($record['id']);
+
+        $config = SystemUserConfig::instance()->getByUserId($record['id']);
+        $auth = null;
+        if ($config) {
+            $auth = SystemAuth::instance()->getListById($config['auth']);
+            AdminLogin::setUserAuth($auth);
+        }
+        $record['ip'] = request()->ip();
+        $record['login_time'] = date('Y-m-d H:i');
+        return [
+            'token' => JsonToken::instance()->make($record['id']),
+            'info' => $record,
+            'config' => SystemUserConfig::instance()->getByUserId($record['id']),
+            'auth' => $auth,
+        ];
+    }
 
     /**
      * @param $username
